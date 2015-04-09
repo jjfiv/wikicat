@@ -38,7 +38,7 @@
 
     <dependency>
       <groupId>org.lemurproject.galago</groupId>
-      <artifactId>utility</artifactId>
+      <artifactId>core</artifactId>
       <version>${galagoVersion}</version>
     </dependency>
   </dependencies>
