@@ -84,7 +84,7 @@ public class WikiTemplateHack {
   public static final Set<String> shipTemplateSet = new HashSet<String>(Arrays.asList(shipTemplates));
 
   public static Map<String,String> templateArgs(String[] split) {
-    TreeMap<String,String> args = new TreeMap<String, String>();
+    TreeMap<String,String> args = new TreeMap<>();
     // skip the first one because it's the name of the template
     for (int i=1; i<split.length; i++) {
       String key = StrUtil.takeBefore(split[i], "=");

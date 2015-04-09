@@ -20,7 +20,7 @@ public class WikiCleanerTest {
   @Test
   public void links() {
     String testInput = "[[File:image.jpg]]keep this data[[Category:1776]]";
-    assertEquals("keep this data<category>1776</category>", WikiCleaner.clean(testInput));
+    assertEquals("keep this data", WikiCleaner.clean(testInput));
   }
 
   @Test

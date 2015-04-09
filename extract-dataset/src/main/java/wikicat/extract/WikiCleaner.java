@@ -76,8 +76,9 @@ public class WikiCleaner {
 
   private static String handleCategoryLink(String title, String input) {
     Parameters mapping = Parameters.parseArray("src", title, "cat", input);
-    System.out.println("CATEGORY: " + mapping.toString()+"\n");
-    return "<category>"+StrUtil.takeAfter(input, ":")+"</category>";
+    System.out.println("CATEGORY: " + mapping.toString());
+    //return "<category>"+StrUtil.takeAfter(input, ":")+"</category>";
+    return "";
   }
 
   public static int getHeaderLevel(String input) {
@@ -134,6 +135,9 @@ public class WikiCleaner {
     input = input.replaceAll("'{2,3}", ""); // ditch all italics
     input = WikiTemplateHack.convertTemplates(title, input);
     input = convertLinks(title, input);
+    if(input.contains("Category:")) {
+      System.out.println("unifinished_business: "+title);
+    }
     return input;
   }
 }

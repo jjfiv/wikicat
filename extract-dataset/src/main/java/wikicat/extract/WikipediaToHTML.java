@@ -35,7 +35,11 @@ public class WikipediaToHTML extends AppFunction {
 
   @Override
   public void run(Parameters argp, PrintStream out) throws Exception {
+    System.err.println(argp);
     List<File> inputFiles = Util.checkAndExpandPaths(argp.getAsList("input", String.class));
+
+    System.err.println(argp.getAsList("input", String.class));
+    System.err.println(inputFiles);
     // write zip file:
     final ZipOutputStream zos = new ZipOutputStream(StreamCreator.openOutputStream(argp.getString("output")));
 
@@ -45,6 +49,7 @@ public class WikipediaToHTML extends AppFunction {
           @Override
           public void process(Map<String, String> data) {
             String pageTitle = data.get("title").replace(' ', '_');
+            System.err.println(pageTitle);
             if (pageTitle.isEmpty() || pageTitle.startsWith("Template") || pageTitle.startsWith("User"))
               return;
             String body = WikipediaToHTML.process(pageTitle, data.get("text"));
@@ -112,6 +117,6 @@ public class WikipediaToHTML extends AppFunction {
     }
 
     System.err.println("#unk "  + title + ": " + input);
-    return " ";
+    return " <template>"+input.replace('|', ' ')+"</template> ";
   }
 }
