@@ -1,6 +1,6 @@
 package wikicat.extract;
 
-import edu.umass.ciir.galagotools.utils.StrUtil;
+import wikicat.extract.util.StrUtil;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -233,7 +233,7 @@ public class WikiTemplateHack {
   public static String convertTemplates(final String title, String input) {
     return StrUtil.transformBetween(input, templateStart, templateEnd, new StrUtil.Transform() {
       @Override
-      public String process(String input) {
+      public String transform(String input) {
         return processTemplate(title, input);
       }
     });

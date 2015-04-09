@@ -1,18 +1,18 @@
 package wikicat.extract;
 
-import edu.umass.ciir.galagotools.utils.SGML;
-import edu.umass.ciir.galagotools.utils.StrUtil;
-import edu.umass.ciir.galagotools.utils.Util;
-import edu.umass.ciir.galagotools.utils.XML;
-import edu.umass.ciir.proteus.athena.Tool;
 import org.lemurproject.galago.utility.ByteUtil;
 import org.lemurproject.galago.utility.Parameters;
 import org.lemurproject.galago.utility.StreamCreator;
 import org.lemurproject.galago.utility.ZipUtil;
 import org.lemurproject.galago.utility.tools.AppFunction;
+import wikicat.extract.util.SGML;
+import wikicat.extract.util.StrUtil;
+import wikicat.extract.util.Util;
+import wikicat.extract.util.XML;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,12 @@ public class WikipediaToHTML extends AppFunction {
   }
 
   @Override
-  public void run(Parameters argp) throws Exception {
+  public String getHelpString() {
+    return makeHelpStr("input", "path to raw wikipedia xml bz2 inputs");
+  }
+
+  @Override
+  public void run(Parameters argp, PrintStream out) throws Exception {
     List<File> inputFiles = Util.checkAndExpandPaths(argp.getAsList("input", String.class));
     // write zip file:
     final ZipOutputStream zos = new ZipOutputStream(StreamCreator.openOutputStream(argp.getString("output")));
@@ -67,7 +72,7 @@ public class WikipediaToHTML extends AppFunction {
     text = text.replaceAll("''", ""); // ditch all italics
     text = StrUtil.transformBetween(text, WikiTemplateHack.templateStart, WikiTemplateHack.templateEnd, new StrUtil.Transform() {
       @Override
-      public String process(String input) {
+      public String transform(String input) {
         return processTemplate(title, input);
       }
     });

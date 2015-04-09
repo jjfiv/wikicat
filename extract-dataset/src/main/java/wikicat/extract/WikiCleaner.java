@@ -1,9 +1,7 @@
 package wikicat.extract;
 
-import edu.umass.ciir.galagotools.utils.DateUtil;
-import edu.umass.ciir.galagotools.utils.SGML;
-import edu.umass.ciir.galagotools.utils.StrUtil;
-import edu.umass.ciir.proteus.athena.linking.LinkingExperiment;
+import wikicat.extract.util.SGML;
+import wikicat.extract.util.StrUtil;
 
 import java.util.regex.Pattern;
 
@@ -33,7 +31,7 @@ public class WikiCleaner {
   public static String convertExternalLinks(String input) {
     return StrUtil.transformBetween(input, Pattern.compile("\\["), Pattern.compile("\\]"), new StrUtil.Transform() {
       @Override
-      public String process(String input) {
+      public String transform(String input) {
         String url = input;
         String text = "link";
         if (input.contains(" ")) {
@@ -49,7 +47,7 @@ public class WikiCleaner {
   public static String convertInternalLinks(String input) {
     return StrUtil.transformBetween(input, Pattern.compile("\\[\\["), Pattern.compile("\\]\\]"), new StrUtil.Transform() {
       @Override
-      public String process(String input) {
+      public String transform(String input) {
         if(input.isEmpty()) return "";
         if(input.charAt(0) == ':') { // special category sort of link
           return "";
@@ -70,9 +68,6 @@ public class WikiCleaner {
           text = input;
         }
 
-        if(DateUtil.isMonthDay(text))
-          return text;
-
         return internalLink(url, text);
       }
     });
@@ -90,7 +85,7 @@ public class WikiCleaner {
   public static String convertHeaders(String input) {
     return StrUtil.transformLines(input, new StrUtil.Transform() {
       @Override
-      public String process(String input) {
+      public String transform(String input) {
         int headerLevel = getHeaderLevel(input);
         if(headerLevel <= 0) return input+'\n';
         String cleaned = StrUtil.compactSpaces(input.replace('=', ' '));
@@ -105,7 +100,7 @@ public class WikiCleaner {
   }
 
   public static String stripWikiUrlToTitle(String url) {
-    return .makeWikipediaTitle(StrUtil.removeFront(url, "https://en.wikipedia.org/wiki/"));
+    return makeWikipediaTitle(StrUtil.removeFront(url, "https://en.wikipedia.org/wiki/"));
   }
   public static String makeWikipediaTitle(String input) {
     if(input.isEmpty()) return "";
