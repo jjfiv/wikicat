@@ -76,7 +76,7 @@ public class WikipediaToHTML extends AppFunction {
         return processTemplate(title, input);
       }
     });
-    text = WikiCleaner.convertLinks(text);
+    text = WikiCleaner.convertLinks(title, text);
     text = WikiCleaner.convertHeaders(text);
 
     return text;

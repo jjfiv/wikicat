@@ -1,5 +1,6 @@
 package wikicat.extract;
 
+import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.SGML;
 import wikicat.extract.util.StrUtil;
 
@@ -23,8 +24,8 @@ public class WikiCleaner {
     return StrUtil.removeBetweenNested(input, "{|", "|}");
   }
 
-  public static String convertLinks(String input) {
-    return convertExternalLinks(convertInternalLinks(input));
+  public static String convertLinks(String title, String input) {
+    return convertExternalLinks(convertInternalLinks(title, input));
   }
 
   /** Do internal first [[ ]], then external [ ] */
@@ -44,7 +45,7 @@ public class WikiCleaner {
   }
 
   /** Do internal first [[ ]], then external [ ] */
-  public static String convertInternalLinks(String input) {
+  public static String convertInternalLinks(final String title, String input) {
     return StrUtil.transformBetween(input, Pattern.compile("\\[\\["), Pattern.compile("\\]\\]"), new StrUtil.Transform() {
       @Override
       public String transform(String input) {
@@ -54,7 +55,7 @@ public class WikiCleaner {
         } else if(input.startsWith("File:") || input.startsWith("Image:")) {
           return "";
         } else if(input.startsWith("Category:")) {
-          return "<category>"+StrUtil.takeAfter(input, ":")+"</category>";
+          return handleCategoryLink(title, input);
         }
 
         String url;
@@ -71,6 +72,12 @@ public class WikiCleaner {
         return internalLink(url, text);
       }
     });
+  }
+
+  private static String handleCategoryLink(String title, String input) {
+    Parameters mapping = Parameters.parseArray("src", title, "cat", input);
+    System.out.println("CATEGORY: " + mapping.toString()+"\n");
+    return "<category>"+StrUtil.takeAfter(input, ":")+"</category>";
   }
 
   public static int getHeaderLevel(String input) {
@@ -126,7 +133,7 @@ public class WikiCleaner {
     input = SGML.removeComments(input);
     input = input.replaceAll("'{2,3}", ""); // ditch all italics
     input = WikiTemplateHack.convertTemplates(title, input);
-    input = convertLinks(input);
+    input = convertLinks(title, input);
     return input;
   }
 }
