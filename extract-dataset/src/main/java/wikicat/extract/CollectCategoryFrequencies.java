@@ -20,9 +20,11 @@ public class CollectCategoryFrequencies {
   public static final int NumSplits = 5;
   public static void main(String[] args) throws IOException {
     List<TObjectIntHashMap<String>> categoryFrequenciesBySplit = new ArrayList<>();
+    List<Set<String>> pagesBySplit = new ArrayList<>();
 
     for (int i = 0; i < NumSplits; i++) {
       categoryFrequenciesBySplit.add(new TObjectIntHashMap<String>());
+      pagesBySplit.add(new HashSet<String>());
     }
 
     Set<String> allCategories = new HashSet<>();
@@ -56,8 +58,18 @@ public class CollectCategoryFrequencies {
         allCategories.add(categoryLabel);
 
         categoryFrequenciesBySplit.get(split).adjustOrPutValue(categoryLabel, 1, 1);
+        pagesBySplit.get(split).add(page);
       }
     }
+
+    for (int split = 0; split < NumSplits; split++) {
+      try (final PrintWriter out = IO.printWriter(String.format("split_names_%d.txt", split))) {
+        for (String s : pagesBySplit.get(split)) {
+          out.println(s);
+        }
+      }
+    }
+    pagesBySplit = null;
 
     try (final PrintWriter out = IO.printWriter("category_frequencies.tsv")) {
       for (String cat : allCategories) {
