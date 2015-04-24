@@ -41,9 +41,8 @@ public class WikipediaToHTML extends AppFunction {
     System.err.println(argp.getAsList("input", String.class));
     System.err.println(inputFiles);
     // write zip file:
-    final ZipOutputStream zos = new ZipOutputStream(StreamCreator.openOutputStream(argp.getString("output")));
 
-    try {
+    try (ZipOutputStream zos = new ZipOutputStream(StreamCreator.openOutputStream(argp.getString("output")))) {
       for (File fp : inputFiles) {
         XML.forFieldsInSections(fp, "page", Arrays.asList("title", "text"), new XML.FieldsFunctor() {
           @Override
@@ -53,8 +52,9 @@ public class WikipediaToHTML extends AppFunction {
             if (pageTitle.isEmpty() || pageTitle.startsWith("Template") || pageTitle.startsWith("User"))
               return;
             String body = WikipediaToHTML.process(pageTitle, data.get("text"));
-            String html = String.format("<html><head><title>%s</title></head><body>%s</body></html>", pageTitle, body);
+            if (body.contains("#REDIRECT")) return;
 
+            String html = String.format("<html><head><title>%s</title></head><body>%s</body></html>", pageTitle, body);
             try {
               ZipUtil.write(zos, pageTitle + ".html", ByteUtil.fromString(html));
             } catch (IOException e) {
@@ -63,8 +63,6 @@ public class WikipediaToHTML extends AppFunction {
           }
         });
       }
-    } finally {
-      zos.close();
     }
   }
 

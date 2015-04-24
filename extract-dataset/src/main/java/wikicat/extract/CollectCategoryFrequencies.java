@@ -17,12 +17,11 @@ import java.util.Set;
  * @author jfoley
  */
 public class CollectCategoryFrequencies {
-  public static final int NumSplits = 5;
   public static void main(String[] args) throws IOException {
     List<TObjectIntHashMap<String>> categoryFrequenciesBySplit = new ArrayList<>();
     List<Set<String>> pagesBySplit = new ArrayList<>();
 
-    for (int i = 0; i < NumSplits; i++) {
+    for (int i = 0; i < Constants.NumSplits; i++) {
       categoryFrequenciesBySplit.add(new TObjectIntHashMap<String>());
       pagesBySplit.add(new HashSet<String>());
     }
@@ -54,7 +53,7 @@ public class CollectCategoryFrequencies {
         if(page.startsWith("Category:")) {
           continue;
         }
-        int split = Math.abs(page.hashCode()) % NumSplits;
+        int split = Math.abs(page.hashCode()) % Constants.NumSplits;
         allCategories.add(categoryLabel);
 
         categoryFrequenciesBySplit.get(split).adjustOrPutValue(categoryLabel, 1, 1);
@@ -62,7 +61,7 @@ public class CollectCategoryFrequencies {
       }
     }
 
-    for (int split = 0; split < NumSplits; split++) {
+    for (int split = 0; split < Constants.NumSplits; split++) {
       try (final PrintWriter out = IO.printWriter(String.format("split_names_%d.txt", split))) {
         for (String s : pagesBySplit.get(split)) {
           out.println(s);
@@ -74,7 +73,7 @@ public class CollectCategoryFrequencies {
     try (final PrintWriter out = IO.printWriter("category_frequencies.tsv")) {
       for (String cat : allCategories) {
         boolean nonzero = true;
-        List<Integer> x = new ArrayList<>(NumSplits);
+        List<Integer> x = new ArrayList<>(Constants.NumSplits);
         for (int split = 0; split < categoryFrequenciesBySplit.size(); split++) {
           int count = categoryFrequenciesBySplit.get(split).get(cat);
           if (count == 0) {
