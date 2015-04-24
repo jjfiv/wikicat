@@ -31,8 +31,8 @@ public class SplitHTMLZip {
 
     try (ZipFile zf = ZipUtil.open(inputFile)) {
       for (String entry : ZipUtil.listZipFile(zf)) {
-        entry = StrUtil.removeBack(entry, ".html");
-        int split = entry.hashCode() % Constants.NumSplits;
+        String name = StrUtil.removeBack(entry, ".html");
+        int split = name.hashCode() % Constants.NumSplits;
         String data = IO.slurp(ZipUtil.readZipEntry(zf, entry));
         if(data.contains("#REDIRECT")) {
           continue;
