@@ -8,13 +8,25 @@ import wikicat.extract.util.StrUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author jfoley
  */
 public class CollectCategoryFrequencies {
+  public static final int NumSplits = 5;
   public static void main(String[] args) throws IOException {
-    TObjectIntHashMap<String> categoryFrequencies = new TObjectIntHashMap<>();
+    List<TObjectIntHashMap<String>> categoryFrequenciesBySplit = new ArrayList<>();
+
+    for (int i = 0; i < NumSplits; i++) {
+      categoryFrequenciesBySplit.add(new TObjectIntHashMap<String>());
+    }
+
+    Set<String> allCategories = new HashSet<>();
+
     int total = 0;
     try (
         BufferedReader reader = IO.fileReader("data/graph.tsv.gz")
@@ -36,18 +48,57 @@ public class CollectCategoryFrequencies {
           categoryLabel = StrUtil.takeBefore(categoryMarkup, "|");
         }
 
-        categoryFrequencies.adjustOrPutValue(categoryLabel, 1, 1);
+        // Just hierarchy information
+        if(page.startsWith("Category:")) {
+          continue;
+        }
+        int split = Math.abs(page.hashCode()) % NumSplits;
+        allCategories.add(categoryLabel);
+
+        categoryFrequenciesBySplit.get(split).adjustOrPutValue(categoryLabel, 1, 1);
       }
     }
 
     try (final PrintWriter out = IO.printWriter("category_frequencies.tsv")) {
-      categoryFrequencies.forEachEntry(new TObjectIntProcedure<String>() {
-        @Override
-        public boolean execute(String s, int i) {
-          out.printf("%s\t%d\n", s, i);
-          return true;
+      for (String cat : allCategories) {
+        boolean nonzero = true;
+        List<Integer> x = new ArrayList<>(NumSplits);
+        for (int split = 0; split < categoryFrequenciesBySplit.size(); split++) {
+          int count = categoryFrequenciesBySplit.get(split).get(cat);
+          if (count == 0) {
+            nonzero = false;
+            break;
+          }
+          x.add(count);
         }
-      });
+        if (nonzero) {
+          // print only categories that exist in every split
+          out.printf("%s", cat);
+          for (int split = 0; split < categoryFrequenciesBySplit.size(); split++) {
+            out.printf("\t%d", categoryFrequenciesBySplit.get(split).get(cat));
+          }
+          out.println();
+        } else {
+          // remove categories that don't exist in every split
+          for (int split = 0; split < categoryFrequenciesBySplit.size(); split++) {
+            categoryFrequenciesBySplit.get(split).remove(cat);
+          }
+        }
+      }
     }
+
+    for (int split = 0; split < categoryFrequenciesBySplit.size(); split++) {
+      TObjectIntHashMap<String> categoryFrequencies = categoryFrequenciesBySplit.get(split);
+      try (final PrintWriter out = IO.printWriter(String.format("category_frequencies_%d.tsv", split))) {
+        categoryFrequencies.forEachEntry(new TObjectIntProcedure<String>() {
+          @Override
+          public boolean execute(String s, int i) {
+            out.printf("%s\t%d\n", s, i);
+            return true;
+          }
+        });
+      }
+    }
+
   }
 }
