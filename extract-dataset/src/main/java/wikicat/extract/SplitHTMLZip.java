@@ -38,7 +38,7 @@ public class SplitHTMLZip {
           continue;
         }
         ZipOutputStream zos = outputBySplit.get(split);
-        ZipUtil.write(zos, entry +".html", ByteUtil.fromString(data));
+        ZipUtil.write(zos, entry, ByteUtil.fromString(data));
       }
     }
 
