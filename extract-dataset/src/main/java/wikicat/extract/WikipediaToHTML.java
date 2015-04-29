@@ -109,12 +109,24 @@ public class WikipediaToHTML extends AppFunction {
       if (targs.length == 2) {
         return WikiCleaner.internalLink(targs[0], targs[1]);
       }
+      if(templateName.equalsIgnoreCase("persondata")) {
+        Map<String, String> args = WikiTemplateHack.templateArgs(targs);
+        StringBuilder sb = new StringBuilder();
+        for (String s : args.values()) {
+          sb.append(s).append(' ');
+        }
+        return StrUtil.compactSpaces(sb.toString());
+      }
     } catch (Exception ex) {
       System.err.println("#caught!");
       ex.printStackTrace(System.err);
     }
 
-    System.err.println("#unk "  + title + ": " + input);
+    // Handle any "templates" that are actually category links
+    if(input.startsWith("Category:")) {
+      return WikiCleaner.handleCategoryLink(title, input);
+    }
+
     return " <template>"+input.replace('|', ' ')+"</template> ";
   }
 }

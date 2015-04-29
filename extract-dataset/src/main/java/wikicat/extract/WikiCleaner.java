@@ -74,7 +74,7 @@ public class WikiCleaner {
     });
   }
 
-  private static String handleCategoryLink(String title, String input) {
+  static String handleCategoryLink(String title, String input) {
     Parameters mapping = Parameters.parseArray("src", title, "cat", input);
     System.out.println("CATEGORY: " + mapping.toString());
     //return "<category>"+StrUtil.takeAfter(input, ":")+"</category>";
