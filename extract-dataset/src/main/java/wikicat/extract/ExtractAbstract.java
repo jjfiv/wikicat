@@ -1,16 +1,19 @@
 package wikicat.extract;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.lemurproject.galago.utility.ByteUtil;
 import org.lemurproject.galago.utility.Parameters;
 import org.lemurproject.galago.utility.ZipUtil;
-import wikicat.extract.util.*;
-import org.jsoup.Jsoup;
+import wikicat.extract.util.DirectoryReader;
+import wikicat.extract.util.SimpleFileWriter;
+import wikicat.extract.util.StrUtil;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Created by mhjang on 4/29/2015.
