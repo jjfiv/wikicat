@@ -13,11 +13,11 @@ import java.util.Map;
 public class BuildCategoryIndex {
 	public static void main(String[] args) throws Exception {
 		Parameters argp = Parameters.create();
+		String method = argp.getString("method");
+		String outputName = argp.getString("output");
+
 		Map<String, CategoryNode> graph = LoadCategoryGraph.load(argp.get("graph", "data/graph.tsv.gz"));
 
-		String method = argp.getString("method");
-		//for (String method : Arrays.asList("title-only", "p10", "c10", "p5", "c5", "n10", "n5")) {
-		String outputName = String.format("cat.%s.trectext.gz", method);
 		System.err.println("Begin build: " + outputName);
 
 		try (PrintWriter out = IO.printWriter(outputName)) {
