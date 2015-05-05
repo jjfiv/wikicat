@@ -1,6 +1,7 @@
 package wikicat.extract;
 
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
 import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.IO;
 
@@ -125,8 +126,8 @@ public class LoadCategoryGraph {
       public void process(String input) {
         String[] col = input.split("\t");
         if (col.length != 2) return;
-        String child = col[0].replace(' ', '_');
-        String parent = col[1].replace(' ', '_');
+        String child = ExtractCategoryGraph.cleanCategory(col[0]);
+        String parent = ExtractCategoryGraph.cleanCategory(col[1]);
 
         CategoryNode pn = nodes.get(parent);
         if (pn == null) {
@@ -141,6 +142,38 @@ public class LoadCategoryGraph {
 
         pn.children.add(cn);
         cn.parents.add(pn);
+      }
+    });
+
+
+    // Find and attach "page" data.
+    IO.forEachLine(IO.fileReader(argp.get("fullGraphInput", "data/graph.tsv.gz")), new IO.StringFunctor() {
+      @Override
+      public void process(String input) {
+        String[] col = input.split("\t");
+        if(col.length != 2) return;
+        String child = col[0];
+        String parent = col[1];
+
+        String cat;
+        String page;
+        if(child.startsWith("Category:")) {
+          cat = child;
+          page = parent;
+        } else if (parent.startsWith("Category:")) {
+          cat = parent;
+          page = child;
+        } else {
+          return;
+        }
+
+        String catName = ExtractCategoryGraph.cleanCategory(cat);
+        CategoryNode node = nodes.get(catName);
+        if(node == null) {
+          node = new CategoryNode(catName);
+          nodes.put(catName, node);
+        }
+        node.relevantPages.add(ExtractCategoryGraph.cleanCategory(page));
       }
     });
 
@@ -166,9 +199,18 @@ public class LoadCategoryGraph {
     System.out.printf("Number of nodes: %d\n", nodes.size());
     System.out.printf("Number of Roots: %d\n", roots.size());
 
-    for (String root : roots) {
-      System.out.println("ROOT: " + root);
+    TIntIntHashMap pageCountFreqs = new TIntIntHashMap();
+    for (CategoryNode node : nodes.values()) {
+      pageCountFreqs.adjustOrPutValue(node.relevantPages.size(), 1, 1);
     }
+
+    pageCountFreqs.forEachEntry(new TIntIntProcedure() {
+      @Override
+      public boolean execute(int numChildren, int freq) {
+        System.out.printf("%d %d\n", numChildren, freq);
+        return true;
+      }
+    });
 
     /*
     childCountFreq.forEachEntry(new TIntIntProcedure() {

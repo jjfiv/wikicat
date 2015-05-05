@@ -12,7 +12,7 @@ import java.io.PrintWriter;
  */
 public class ExtractCategoryGraph {
   public static String cleanCategory(String input) {
-    return StrUtil.takeBefore(StrUtil.removeFront(input, "Category:"), "|");
+    return StrUtil.takeBefore(StrUtil.removeFront(input, "Category:"), "|").trim().replace(' ', '_');
   }
 
   public static void main(String[] args) throws IOException {
