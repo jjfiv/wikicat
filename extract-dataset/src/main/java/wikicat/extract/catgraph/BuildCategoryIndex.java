@@ -20,7 +20,7 @@ public class BuildCategoryIndex {
 		for (String method : Arrays.asList("title-only", "p10", "c10", "p5", "c5", "n10", "n5")) {
 			String outputName = String.format("cat.%s.trectext.gz", method);
 			File outF = new File(outputName);
-			if(outF.exists() && outF.isDirectory()) {
+			if(outF.exists()) {
 				System.err.println("# skipping "+outputName);
 				continue;
 			}

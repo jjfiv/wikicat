@@ -59,7 +59,7 @@ public class CategoryNode {
 		}
 
 		public boolean isDone() {
-			return foundCount() >= limit;
+			return frontier.isEmpty() || foundCount() >= limit;
 		}
 
 		public void processSingleStep() {
@@ -79,7 +79,7 @@ public class CategoryNode {
 			List<String> total = new ArrayList<>();
 			total.addAll(visited);
 			total.addAll(frontier);
-			return new ArrayList<>(total.subList(0, limit));
+			return new ArrayList<>(total.subList(0, Math.min(limit, total.size())));
 		}
 
 		public void addToFrontier(String key) {

@@ -37,6 +37,7 @@ public class LoadCategoryGraph {
         String parent = col[1];
         if(++edge % 100000 == 0) {
           System.err.println(edge);
+          //if(edge > 1000000) break;
         }
 
         // Link describes category to category link:
