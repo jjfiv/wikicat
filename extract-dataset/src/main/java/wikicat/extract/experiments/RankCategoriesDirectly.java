@@ -5,6 +5,7 @@ import org.lemurproject.galago.core.retrieval.Results;
 import org.lemurproject.galago.core.retrieval.ScoredDocument;
 import org.lemurproject.galago.core.retrieval.query.Node;
 import org.lemurproject.galago.utility.Parameters;
+import wikicat.extract.catgraph.LoadCategoryGraph;
 import wikicat.extract.util.IO;
 
 import java.io.IOException;
@@ -37,7 +38,8 @@ public class RankCategoriesDirectly extends Experiment {
 				}
 				Results results = retrieval.transformAndExecuteQuery(queryNode);
 				for (ScoredDocument sdoc : results.scoredDocuments) {
-					sdoc.toTRECformat(q.qid());
+					sdoc.documentName = LoadCategoryGraph.cleanCategory(sdoc.documentName).replaceAll("\\s+", "_");
+					output.println(sdoc.toTRECformat(q.qid()));
 				}
 			}
 		} catch (IOException e) {
@@ -45,7 +47,4 @@ public class RankCategoriesDirectly extends Experiment {
 		}
 	}
 
-	public static void main(String[] args) {
-
-	}
 }
