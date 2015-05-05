@@ -33,6 +33,16 @@ public class DirectoryReader {
         readFiles(folder);
 
     }
+
+    public DirectoryReader(String[] dirs) {
+        filenames = new ArrayList<String>();
+        for(String dir : dirs) {
+            File folder = new File(dir);
+            System.out.println("reading " + folder.getAbsolutePath());
+            this.dir = dir;
+            readFiles(folder);
+        }
+    }
     private void readFiles(File folder) {
         for (final File fileEntry : folder.listFiles()) {
             if(openOption == FILE_ONLY) {
