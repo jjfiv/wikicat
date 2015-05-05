@@ -12,7 +12,8 @@ import java.util.Map;
  */
 public class BuildCategoryIndex {
 	public static void main(String[] args) throws Exception {
-		Parameters argp = Parameters.create();
+		Parameters argp = Parameters.parseArgs(args);
+		System.err.println(argp.toPrettyString());
 		String method = argp.getString("method");
 		String outputName = argp.getString("output");
 
