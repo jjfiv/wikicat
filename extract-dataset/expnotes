@@ -1,3 +1,7 @@
+2015/5/5
+Generated a mini split data with 10000 docs in each split. Available at /mnt/nfs/work3/mhjang/split/mini/.
+
+
 2015/4/31
 
 Extracted abstract from each article in TREC format and generated split[0-4].txt

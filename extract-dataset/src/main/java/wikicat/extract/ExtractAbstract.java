@@ -38,13 +38,31 @@ public class ExtractAbstract {
     }
 
     public static void main(String[] args) throws IOException {
-         Parameters argp = Parameters.parseArgs(args);
-         String inputDir = argp.getString("input");
-        // String inputDir = "C:/Users/mhjang/Desktop/split_wiki_html/split1";
-        //   String outputName = argp.getString("output")
+       //  Parameters argp = Parameters.parseArgs(args);
+       //  String inputDir = argp.getString("input");
+         String inputDir = "C:/Users/mhjang/Desktop/split_wiki_html/split0";
+        String inputDir2 = "C:/Users/mhjang/Desktop/split_wiki_html/split1";
+        String inputDir3 = "C:/Users/mhjang/Desktop/split_wiki_html/split2";
+        String inputDir4 = "C:/Users/mhjang/Desktop/split_wiki_html/split3";
 
-        DirectoryReader dr = new DirectoryReader(inputDir);
-        SimpleFileWriter sw = new SimpleFileWriter("split0.txt");
+        String[] dirs = {inputDir, inputDir2, inputDir3, inputDir4};
+
+        //       String outputName = argp.getString("output")
+
+        DirectoryReader dr = new DirectoryReader(dirs);
+
+        SimpleFileWriter sw;
+        SimpleFileWriter sw0 = new SimpleFileWriter("mini_split0.txt");
+        SimpleFileWriter sw1 = new SimpleFileWriter("mini_split1.txt");
+        SimpleFileWriter sw2 = new SimpleFileWriter("mini_split2.txt");
+        SimpleFileWriter sw3 = new SimpleFileWriter("mini_split3.txt");
+        SimpleFileWriter sw4 = new SimpleFileWriter("mini_split4.txt");
+        SimpleFileWriter docList = new SimpleFileWriter("list.txt");
+
+
+
+        int docCount = 0;
+        sw = sw0;
         for (String filePath : dr.getFilePathList()) {
             try (ZipFile zf = ZipUtil.open(filePath)) {
                 for (String entry : ZipUtil.listZipFile(zf)) {
@@ -56,17 +74,42 @@ public class ExtractAbstract {
                         wikiHtmlBuilder.append(line + "\n");
                     }
                     String abstractText = extractAbstract(wikiHtmlBuilder.toString());
+                    if(docCount == 50000) {
+                        sw.close();
+                        break;
+                    }
+                    else if(docCount == 40000) {
+                        sw.close();
+                        sw = sw4;
+                    }
+                    else if(docCount == 30000) {
+                        sw.close();
+                        sw = sw3;
+                    }
+                    else if(docCount == 20000) {
+                        sw.close();
+                        sw = sw2;
+                    }
+                    else if(docCount == 10000) {
+                        sw.close();
+                        sw = sw1;
+                    }
+                    String title = StrUtil.removeBack(entry, ".html.html");
                     sw.writeLine("<DOC>");
-                    sw.writeLine("<DOCNO> " + StrUtil.removeBack(entry, ".html.html") + "</DOCNO>");
+                    sw.writeLine("<DOCNO>" + title  + "</DOCNO>");
                     sw.writeLine("<TEXT>");
                     sw.writeLine(abstractText);
                     sw.writeLine("</TEXT>");
                     sw.writeLine("</DOC>");
+                    docList.writeLine(docCount + "\t" + title);
+                    docCount++;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        docList.close();
+
 
     }
 }
