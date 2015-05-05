@@ -1,4 +1,4 @@
-package wikicat.extract;
+package wikicat.extract.preprocess;
 
 import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.IO;
