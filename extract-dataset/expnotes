@@ -1,6 +1,8 @@
 
 
 2015/5/5
+~5pm:    Generated a bunch of category indexes, can be found on: /mnt/nfs/work3/jfoley/wikicat/indices/
+         Waiting for them to upload to sydney
 ~2pm:    Generated index of all abstracts, can use it to pull documents by name: /mnt/nfs/work3/jfoley/wikicat/simple-wiki-abstract.galago
 earlier: Generated a mini split data with 10000 docs in each split. Available at /mnt/nfs/work3/mhjang/split/mini/.
 
