@@ -6,9 +6,7 @@ import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.IO;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author jfoley
@@ -28,6 +26,24 @@ public class LoadCategoryGraph {
       this.parents = new HashSet<>();
       this.children = new HashSet<>();
       this.relevantPages = new HashSet<>();
+    }
+
+    public Parameters toJSON() {
+      Parameters out = Parameters.create();
+      out.put("id", id);
+      out.put("name", name);
+      List<Integer> childIds = new ArrayList<>();
+      for (CategoryNode child : children) {
+        childIds.add(child.id);
+      }
+      List<Integer> parentIds = new ArrayList<>();
+      for (CategoryNode parent : parents) {
+        parentIds.add(parent.id);
+      }
+      out.put("children", childIds);
+      out.put("parents", parentIds);
+      out.put("pages", relevantPages);
+      return out;
     }
 
     /** Get descendants, loosely; i.e. crawl using only the child relation */
