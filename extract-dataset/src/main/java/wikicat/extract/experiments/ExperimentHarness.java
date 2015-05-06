@@ -1,12 +1,16 @@
 package wikicat.extract.experiments;
 
+import org.lemurproject.galago.core.retrieval.ScoredDocument;
 import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.Constants;
+import wikicat.extract.catgraph.LoadCategoryGraph;
 import wikicat.extract.util.IO;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jfoley.
@@ -38,20 +42,40 @@ public class ExperimentHarness {
 		// Now split up:
 		List<List<PageQuery>> bySplit = new ArrayList<>();
 		for (int i = 0; i < Constants.NumSplits; i++) {
-			bySplit.add(asQueries.subList(Constants.SplitSize * i, Constants.SplitSize * (i+1)));
+			List<PageQuery> curSplit = new ArrayList<>();
+			for (PageQuery query : asQueries.subList(Constants.SplitSize * i, Constants.SplitSize * (i + 1))) {
+				if(query.title.startsWith("Category:")) continue;
+				curSplit.add(query);
+			}
+			bySplit.add(curSplit);
 		}
 
 		return bySplit;
 	}
 
-	/** Run experiment for each split with list of query pages appropriately. */
+	/** Run experiment for this split with list of query pages appropriately. */
 	public static void runExperiment(Parameters argp, Experiment experiment) throws IOException {
+		String outputFileName = argp.getString("output");
+		int splitId = (int) argp.getLong("split");
 		List<List<PageQuery>> queriesBySplit = loadQueryPages(argp.get("query-split-defs", "list.txt"));
-		for (int splitId = 0; splitId < queriesBySplit.size(); splitId++) {
-			List<PageQuery> pagesInSplit = queriesBySplit.get(splitId);
-			experiment.run(splitId, pagesInSplit);
+
+		// Get queries to run and run them:
+		List<PageQuery> pagesInSplit = queriesBySplit.get(splitId);
+		Map<String, List<ScoredDocument>> results = experiment.run(splitId, pagesInSplit);
+
+		// write results to output file:
+		try (PrintWriter output = IO.printWriter(outputFileName)) {
+			for (Map.Entry<String, List<ScoredDocument>> kv : results.entrySet()) {
+				String qid = kv.getKey();
+				for (ScoredDocument sdoc : kv.getValue()) {
+					sdoc.documentName = LoadCategoryGraph.cleanCategory(sdoc.documentName).replaceAll("\\s+", "_");
+					output.println(sdoc.toTRECformat(qid));
+				}
+			}
 		}
+
 	}
+
 	public static void run(Parameters argp) throws Exception {
 		switch(argp.get("experiment", "direct")) {
 			case "direct":
