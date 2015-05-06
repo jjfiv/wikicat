@@ -12,6 +12,8 @@ buildNumber.properties
 *.gz
 *.bz2
 *.iml
+*.trecrun
+*.eval
 .idea
 *.tsv
 *.galago
