@@ -80,6 +80,7 @@ public class ExperimentHarness {
 		switch(argp.get("experiment", "direct")) {
 			case "direct":
 				runExperiment(argp, new RankCategoriesDirectly(argp));
+				break;
 			default:
 				throw new RuntimeException(argp.getString("experiment"));
 		}
