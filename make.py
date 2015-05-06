@@ -91,7 +91,7 @@ for split in classifier_splits:
     rlfile = "splits%d.rlinput" % (split)
     rlfiles += [rlfile]
     print("%s: %s" % (rlfile, ' '.join(trecruns)))
-    print("\t${PREFIX} ${JAVA} ${JOPT} -cp ${JAR} wikicat.extract.experiments.TrecRunReranker --output=$@ %s" % ' '.join(['--input+'+x for x in trecruns]))
+    print("\t${PREFIX} ${JAVA} ${JOPT} -cp ${JAR} wikicat.extract.experiments.TrecRunReranker --judgments=split%d.qrel --output=$@ %s" % (split, ' '.join(['--input+'+x for x in trecruns])))
     print
 
 models = []
