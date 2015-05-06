@@ -51,12 +51,13 @@ galago_operator_methods = [
     "combine",
     "sdm"
 ]
-splits = [0,1,2,3,4]
+# only need to run the *full* settings on the classifier train/validate
+classifier_splits = [0,1]
 
 runs = []
 for method in ["direct"]:
     for qm in galago_operator_methods:
-        for split in splits:
+        for split in classifier_splits:
             for cat_index_m in cat_indexing_methods:
                 output = "split%d.%s.%s.%s.trecrun" % (split, method, cat_index_m, qm)
                 runs += [output]
