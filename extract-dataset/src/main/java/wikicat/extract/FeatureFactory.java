@@ -7,6 +7,9 @@ import org.lemurproject.galago.core.parse.stem.KrovetzStemmer;
 import org.lemurproject.galago.core.parse.stem.Stemmer;
 import org.lemurproject.galago.core.retrieval.Retrieval;
 import org.lemurproject.galago.core.retrieval.RetrievalFactory;
+import org.lemurproject.galago.core.retrieval.ScoredDocument;
+import org.lemurproject.galago.core.retrieval.query.Node;
+import org.lemurproject.galago.core.retrieval.query.StructuredQuery;
 import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.SimpleFileReader;
 
@@ -44,42 +47,66 @@ public class FeatureFactory {
     }
 
     public void generateFeature() throws Exception {
-            Multiset<Integer> featureSet = HashMultiset.create();
-     //   SimpleFileReader sr = new SimpleFileReader("C:\\Users\\mhjang\\Desktop\\graph.tsv");
-     //   while(sr.hasMoreLines()) {
-     /*       String line = sr.readLine();
+        SimpleFileReader sr = new SimpleFileReader("C:\\Users\\mhjang\\IdeaProjects\\wikicatnew\\list.txt");
+        LinkedList<String> docList = new LinkedList<>();
+        int count = 0;
+        while (sr.hasMoreLines()) {
+            String line = sr.readLine();
+            docList.add(line.split("\t")[1]);
+            if (count++ == 10000) break;
+        }
+
+
+        SimpleFileReader sr2 = new SimpleFileReader("C:\\Users\\mhjang\\Desktop\\graph.tsv");
+        while (sr2.hasMoreLines()) {
+
+            String line = sr2.readLine();
             String[] tokens = line.split("\t");
-            String article = tokens[0];
+            String query = tokens[0];
             String category = tokens[1];
-            */
+            if (query.contains("Category:") || !docList.contains(query)) continue;
             Document.DocumentComponents dc = new Document.DocumentComponents(true, false, true);
             String jsonConfigFile = "C:\\Users\\mhjang\\IdeaProjects\\wikicatnew\\extract-dataset\\search.params";
             Parameters globalParams = Parameters.parseFile(jsonConfigFile);
+            Parameters p = Parameters.create();
+            p.set("startAt", 0);
+            p.set("requested", 20);
+            p.set("metrics", "map");
+
             Retrieval retrieval = RetrievalFactory.instance(globalParams);
-            String query = "Model_figure";
+            Multiset<Integer> featureSet = HashMultiset.create();
             Document d = retrieval.getDocument(query, dc);
             // generate feature
             List<String> grams = getNGramFeatures(d.terms);
-            System.out.println();
             // generate query
-            System.out.print("1 qid:" + encodeQuery(query) + " ");
-            for(String g : grams) {
+            System.out.print("1 qid:" + encodeQuery(category) + " ");
+            for (String g : grams) {
                 featureSet.add(encodeFeature(g));
             }
 
             ArrayList<Integer> featureIds = new ArrayList<Integer>(featureSet);
             Collections.sort(featureIds);
-            for(Integer i : featureIds) {
-                System.out.print(i + ": " + 1 +" ");
+            for (Integer i : featureIds) {
+                System.out.print(i + ": " + 1 + " ");
             }
 
             // get the ranked list back
             // take random # articles and encode it as negative features
+            Node root = StructuredQuery.parse(d.text);
+            Node transformed = retrieval.transformQuery(root, p);
+            List<ScoredDocument> results = null;
+            results = retrieval.executeQuery(transformed, p).scoredDocuments;
 
-    //    }
+            for(ScoredDocument sd:results.subList(0,5)){ // print results
+                Document doc = retrieval.getDocument(sd.documentName, new Document.DocumentComponents(true, true, true));
+                List<String> grams = getNGramFeatures(doc.terms);
 
 
+            }
+            //    }
 
+
+        }
     }
 
     private List<String> getNGramFeatures(List<String> terms) {
