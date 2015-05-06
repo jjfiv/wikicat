@@ -53,11 +53,6 @@
       <artifactId>core</artifactId>
       <version>${galagoVersion}</version>
     </dependency>
-    <dependency>
-      <groupId>org.lemurproject.galago</groupId>
-      <artifactId>eval</artifactId>
-      <version>${galagoVersion}</version>
-    </dependency>
 
       <dependency>
           <groupId>org.jsoup</groupId>
