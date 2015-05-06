@@ -58,22 +58,24 @@ public class FeatureFactory {
 
 
         SimpleFileReader sr2 = new SimpleFileReader("C:\\Users\\mhjang\\Desktop\\graph.tsv");
+        // document - # of categories
+        Multiset labelCount = HashMultiset.create();
         while (sr2.hasMoreLines()) {
-
             String line = sr2.readLine();
             String[] tokens = line.split("\t");
             String query = tokens[0];
             String category = tokens[1];
             if (query.contains("Category:") || !docList.contains(query)) continue;
-            Document.DocumentComponents dc = new Document.DocumentComponents(true, false, true);
-            String jsonConfigFile = "C:\\Users\\mhjang\\IdeaProjects\\wikicatnew\\extract-dataset\\search.params";
-            Parameters globalParams = Parameters.parseFile(jsonConfigFile);
-            Parameters p = Parameters.create();
-            p.set("startAt", 0);
-            p.set("requested", 20);
-            p.set("metrics", "map");
 
-            Retrieval retrieval = RetrievalFactory.instance(globalParams);
+            labelCount.add(query);
+        }
+
+        Document.DocumentComponents dc = new Document.DocumentComponents(true, false, true);
+        String jsonConfigFile = "C:\\Users\\mhjang\\IdeaProjects\\wikicatnew\\extract-dataset\\search.params";
+        Parameters globalParams = Parameters.parseFile(jsonConfigFile);
+        Retrieval retrieval = RetrievalFactory.instance(globalParams);
+
+        for(String query : labelCount.entrySet()) {
             Multiset<Integer> featureSet = HashMultiset.create();
             Document d = retrieval.getDocument(query, dc);
             // generate feature
@@ -89,17 +91,26 @@ public class FeatureFactory {
             for (Integer i : featureIds) {
                 System.out.print(i + ": " + 1 + " ");
             }
+        }
 
             // get the ranked list back
             // take random # articles and encode it as negative features
+            String jsonConfigFile2 = "C:\\Users\\mhjang\\IdeaProjects\\wikicatnew\\extract-dataset\\catsearch.params";
+            Parameters globalParams2 = Parameters.parseFile(jsonConfigFile2);
+            Retrieval catRetrieval = RetrievalFactory.instance(globalParams2);
             Node root = StructuredQuery.parse(d.text);
-            Node transformed = retrieval.transformQuery(root, p);
+            Parameters p = Parameters.create();
+            p.set("startAt", 0);
+            p.set("requested", 20);
+            p.set("metrics", "map");
+            Node transformed = catRetrieval.transformQuery(root, p);
             List<ScoredDocument> results = null;
-            results = retrieval.executeQuery(transformed, p).scoredDocuments;
+            results = catRetrieval.executeQuery(transformed, p).scoredDocuments;
 
-            for(ScoredDocument sd:results.subList(0,5)){ // print results
-                Document doc = retrieval.getDocument(sd.documentName, new Document.DocumentComponents(true, true, true));
-                List<String> grams = getNGramFeatures(doc.terms);
+            for(ScoredDocument sd:results){ // print results
+                Document doc = catRetrieval.getDocument(sd.documentName, new Document.DocumentComponents(true, true, true));
+                if(sd.documentName.contains("category:"))
+                    List<String> grams = getNGramFeatures(doc.terms);
 
 
             }
