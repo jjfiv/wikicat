@@ -5,12 +5,10 @@ import org.lemurproject.galago.core.retrieval.Results;
 import org.lemurproject.galago.core.retrieval.ScoredDocument;
 import org.lemurproject.galago.core.retrieval.query.Node;
 import org.lemurproject.galago.utility.Parameters;
-import wikicat.extract.catgraph.LoadCategoryGraph;
-import wikicat.extract.util.IO;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jfoley.
@@ -24,27 +22,23 @@ public class RankCategoriesDirectly extends Experiment {
 	}
 
 	@Override
-	public void run(int splitId, List<ExperimentHarness.PageQuery> pagesInSplit) {
-		String outputFileName = argp.get("output", "title-only.combine")+".split"+splitId+".trecrun";
-		System.err.println("# Writing output to "+outputFileName);
+	public Map<String, List<ScoredDocument>> run(int splitId, List<ExperimentHarness.PageQuery> pagesInSplit) {
+		Map<String, List<ScoredDocument>> runsByQuery = new HashMap<>();
 
-		try (PrintWriter output = IO.printWriter(outputFileName)) {
-			for (ExperimentHarness.PageQuery q : pagesInSplit) {
-				List<String> terms = tokenizePageTitle(q.title);
-				System.err.println(terms);
-				Node queryNode = new Node(argp.get("cat-galago-op", "combine")); // default to unigrams
-				for (String term : terms) {
-					queryNode.addChild(Node.Text(term));
-				}
-				Results results = retrieval.transformAndExecuteQuery(queryNode);
-				for (ScoredDocument sdoc : results.scoredDocuments) {
-					sdoc.documentName = LoadCategoryGraph.cleanCategory(sdoc.documentName).replaceAll("\\s+", "_");
-					output.println(sdoc.toTRECformat(q.qid()));
-				}
+		for (ExperimentHarness.PageQuery q : pagesInSplit) {
+			List<String> terms = tokenizePageTitle(q.title);
+			System.err.println(argp.getLong("split")+" "+q.qid() + " " + terms);
+			if(terms.isEmpty()) {
+				continue;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			Node queryNode = new Node(argp.getString("cat-galago-op"));
+			for (String term : terms) {
+				queryNode.addChild(Node.Text(term));
+			}
+			Results results = retrieval.transformAndExecuteQuery(queryNode);
+			runsByQuery.put(q.qid(), results.scoredDocuments);
 		}
+		return runsByQuery;
 	}
 
 }

@@ -13,7 +13,6 @@ import org.lemurproject.galago.core.retrieval.query.StructuredQuery;
 import org.lemurproject.galago.utility.Parameters;
 import wikicat.extract.util.SimpleFileReader;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -99,7 +98,7 @@ public class FeatureFactory {
 
             for(ScoredDocument sd:results.subList(0,5)){ // print results
                 Document doc = retrieval.getDocument(sd.documentName, new Document.DocumentComponents(true, true, true));
-                List<String> grams = getNGramFeatures(doc.terms);
+                //List<String> grams = getNGramFeatures(doc.terms);
 
 
             }
