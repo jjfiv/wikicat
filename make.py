@@ -55,6 +55,7 @@ galago_operator_methods = [
 classifier_splits = [0,1]
 
 runs = []
+evals = []
 for method in ["direct"]:
     for qm in galago_operator_methods:
         for split in classifier_splits:
@@ -66,6 +67,15 @@ for method in ["direct"]:
                 print("\t${PREFIX} ${JAVA} ${JOPT} -cp ${JAR} wikicat.extract.experiments.ExperimentHarness --experiment=%s --split=%d --cat-galago-op=%s --cat-index=%s --output=$@" %(method, split, qm, cat_index))
                 print
 
+                eval_output = "split%d.%s.%s.%s.eval" % (split, method, cat_index_m, qm)
+                print(eval_output+": "+output)
+                print("\t${PREFIX} ${JAVA} ${JOPT} -cp ${JAR} org.lemurproject.galago.core.tools.App eval --comparisons=false --metrics+map --metrics+ndcg --metrics+p1 --metrics+p10 --judgments=split%d.qrel --runs+$< > $@" % (split))
+                print
+                evals += [eval_output]
+
 print(".PHONY: runs")
 print("runs: " + ' '.join(runs))
-
+print
+print(".PHONY: evals")
+print("evals: " + ' '.join(evals))
+print
