@@ -53,13 +53,18 @@ galago_operator_methods = [
 ]
 splits = [0,1,2,3,4]
 
+runs = []
 for method in ["direct"]:
     for qm in galago_operator_methods:
         for split in splits:
             for cat_index_m in cat_indexing_methods:
                 output = "split%d.%s.%s.%s.trecrun" % (split, method, cat_index_m, qm)
+                runs += [output]
                 cat_index = "cat.%s.galago" % (cat_index_m)
                 print(output+":")
                 print("\t${PREFIX} ${JAVA} ${JOPT} -cp ${JAR} wikicat.extract.experiments.ExperimentHarness --experiment=%s --split=%d --cat-galago-op=%s --cat-index=%s --output=$@" %(method, split, qm, cat_index))
                 print
+
+print(".PHONY: runs")
+print("runs: " + ' '.join(runs))
 
