@@ -68,7 +68,8 @@ public class ExperimentHarness {
 			for (Map.Entry<String, List<ScoredDocument>> kv : results.entrySet()) {
 				String qid = kv.getKey();
 				for (ScoredDocument sdoc : kv.getValue()) {
-					sdoc.documentName = LoadCategoryGraph.cleanCategory(sdoc.documentName).replaceAll("\\s+", "_");
+					sdoc.documentName = LoadCategoryGraph.cleanCategory(sdoc.documentName).replaceAll("\\s+", "_").trim();
+					if(sdoc.documentName.isEmpty()) continue;
 					output.println(sdoc.toTRECformat(qid));
 				}
 			}
