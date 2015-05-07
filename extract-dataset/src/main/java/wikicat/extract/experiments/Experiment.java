@@ -21,7 +21,10 @@ public abstract class Experiment {
 	public abstract Map<String, List<ScoredDocument>> run(int splitId, List<ExperimentHarness.PageQuery> pagesInSplit);
 
 
+	public static List<String> tokenizePageTitle(Tokenizer tok, String input) {
+		return tok.tokenize(input.replaceAll("_", " ").toLowerCase()).terms;
+	}
 	public List<String> tokenizePageTitle(String input) {
-		return tokenizer.tokenize(input.replaceAll("_", " ").toLowerCase()).terms;
+		return tokenizePageTitle(tokenizer, input);
 	}
 }

@@ -1,4 +1,8 @@
-
+2015/5/6
+Findings: SDM > QL for everything in first pass ranking (split0 and split1)
+0-5 title neighbors better than 10+
+Children more useful than parents or combination thereof (perhaps because there are fewer of them)... so leaf nodes have shorter documents and end up being preferred.
+This suggests that isLeaf will be a helpful reranking feature, same with numChildren.
 
 2015/5/5
 ~5pm:    Generated a bunch of category indexes, can be found on: /mnt/nfs/work3/jfoley/wikicat/indices/
